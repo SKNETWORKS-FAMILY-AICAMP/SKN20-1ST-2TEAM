@@ -23,13 +23,13 @@
       <sub>데이터 전처리, 테이블 명세서 작성</sub>
     </td>
     <td align="center">
-      <img src="./img/plankton.jpeg" width="100"><br>
+      <img src="./img/plankton-removebg-preview.png" width="100"><br>
       <b>이성현</b><br>
       데이터베이스 담당<br>
       <sub>ERD 설계, DB 구축 및 연동</sub>
     </td>
     <td align="center">
-      <img src="./img/squirrel.jpg" width="100"><br>
+      <img src="./img/squirrel-removebg-preview.png" width="100"><br>
       <b>최유정</b><br>
       프론트엔드/UI<br>
       <sub>Streamlit 화면 설계 및 발표 자료 제작</sub>
@@ -118,6 +118,12 @@
 
    * 현대·기아 FAQ는 항목이 풍부하나 최신성·중복 문제 존재
    * 사용자 중심 분류 체계가 미흡 → 고객 불편 초래
+
+---
+
+## 🗂️ ERD  
+
+<img src="./screenshot/erd.png" width="600">
 
 ---
 
