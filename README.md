@@ -23,7 +23,7 @@
       <sub>데이터 전처리, 테이블 명세서 작성</sub>
     </td>
     <td align="center">
-      <img src="./img/plankton.jpeg" width="100"><br>
+      <img src="./img/plankton-removebg-preview.png" width="100"><br>
       <b>이성현</b><br>
       데이터베이스 담당<br>
       <sub>ERD 설계, DB 구축 및 연동</sub>
