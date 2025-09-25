@@ -120,10 +120,9 @@
    * 사용자 중심 분류 체계가 미흡 → 고객 불편 초래
 
 ---
-
 ## 🗂️ ERD  
 
-| <img src="./screenshot/erd.png" width="400"> |
+<img src="./screenshot/erd.png" width="600">
 
 ---
 
