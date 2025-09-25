@@ -1,9 +1,9 @@
-# data_viewer.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from db_manager import get_db_engine
 from data_collector import collect_and_save_data
+from population_data_loader import get_population_data_from_db
 
 # ------------------ 데이터 로드 ------------------
 def load_data_and_save_to_session():
@@ -21,9 +21,37 @@ def load_data_and_save_to_session():
         faq_df = pd.read_sql("SELECT question, answer, source FROM faq", engine)
     except Exception:
         faq_df = pd.DataFrame()
+        
+    population_df = get_population_data_from_db()
+    
+    combined_df = pd.DataFrame()
+    if not car_df.empty and not population_df.empty:
+        # population 데이터의 region 컬럼을 앞 2글자로 전처리 (요청 반영)
+        population_df['region'] = population_df['region'].str[:2]
+        
+        # sido별 차량 등록대수 합계
+        car_summary = car_df.groupby('sido')['count'].sum().reset_index()
+        
+        # 두 데이터프레임 병합
+        combined_df = pd.merge(
+            car_summary, 
+            population_df, 
+            left_on='sido', 
+            right_on='region', 
+            how='inner'
+        )
+        
+        # '자동차대수_대비_인구수' 비율 계산
+        combined_df['car_pop_ratio'] = combined_df['count'] / combined_df['popul']
+        
+        # 컬럼 이름 정리
+        combined_df = combined_df.rename(columns={'count': 'car_count', 'popul': 'population'})
+        
+        print("✅ 지역별 자동차 대비 인구수 데이터셋 생성 완료.")
 
     st.session_state.car_data = car_df
     st.session_state.faq_data = faq_df
+    st.session_state.population_data = combined_df
     engine.dispose()
 
 # ------------------ 메인 페이지 ------------------
@@ -55,52 +83,83 @@ def show_main_page():
             st.rerun()
 
 # ------------------ 데이터 조회 페이지 ------------------
-def show_data_dashboard(car_df):
+def show_data_dashboard(car_df, combined_df):
     st.markdown(f"""
         <div style="position: sticky; top: 0; background-color: white; padding: 1rem 0; z-index: 999; border-bottom: 1px solid #e6e6e6;">
-            <h1 style='margin:0;'>📈 차량 등록 통계</h1>
+            <h1 style='margin:0;'>📈 데이터 대시보드</h1>
         </div>
     """, unsafe_allow_html=True)
+    
+    tabs = st.tabs(["차량 통계", "인구수-차량 비율", "데이터 테이블"])
 
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        years = sorted(car_df["year"].unique())
-        selected_year = st.selectbox("연도", years, key='year_select')
-    with col2:
-        months = sorted(car_df[car_df["year"] == selected_year]["month"].unique())
-        selected_month = st.selectbox("월", months, key='month_select')
-    with col3:
-        sido_list = sorted(car_df["sido"].unique())
-        selected_sido = st.selectbox("시도", sido_list, key='sido_select')
-    with col4:
-        filtered_sigungu = sorted(car_df[car_df["sido"] == selected_sido]["sigungu"].unique())
-        selected_sigungu = st.selectbox("시군구", filtered_sigungu, key='sigungu_select')
+    with tabs[0]:
+        st.subheader("차량 등록 데이터")
+        if car_df.empty:
+            st.warning("차량 등록 데이터가 없습니다. `data_collector.py`를 실행하여 데이터를 수집해주세요.")
+            return
 
-    filtered_df = car_df[
-        (car_df["year"] == selected_year) &
-        (car_df["month"] == selected_month) &
-        (car_df["sido"] == selected_sido) &
-        (car_df["sigungu"] == selected_sigungu)
-    ]
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            years = sorted(car_df["year"].unique())
+            selected_year = st.selectbox("연도", years, key='year_select')
+        with col2:
+            months = sorted(car_df[car_df["year"] == selected_year]["month"].unique())
+            selected_month = st.selectbox("월", months, key='month_select')
+        with col3:
+            sido_list = sorted(car_df["sido"].unique())
+            selected_sido = st.selectbox("시도", sido_list, key='sido_select')
+        with col4:
+            filtered_sigungu = sorted(car_df[car_df["sido"] == selected_sido]["sigungu"].unique())
+            selected_sigungu = st.selectbox("시군구", filtered_sigungu, key='sigungu_select')
 
-    if filtered_df.empty:
-        st.warning("선택한 조건에 해당하는 데이터가 없습니다.")
-    else:
-        tabs_car = st.tabs(["차량 종류별", "차량 용도별", "데이터 테이블"])
-        with tabs_car[0]:
-            st.subheader("차량 종류별 등록대수")
-            chart_df = filtered_df.groupby("car_type")["count"].sum().reset_index()
-            fig = px.bar(chart_df, x='car_type', y='count')
-            fig.update_layout(title_text='차량 종류별 등록대수', showlegend=False)
-            st.plotly_chart(fig, use_container_width=True)
-        with tabs_car[1]:
-            st.subheader("차량 용도별 비율")
-            pie_df = filtered_df.groupby("usage_type")["count"].sum().reset_index()
-            fig = px.pie(pie_df, names='usage_type', values='count', hole=0.45)
-            st.plotly_chart(fig, use_container_width=True)
-        with tabs_car[2]:
-            st.subheader("필터링된 데이터")
-            st.dataframe(filtered_df, height=400, use_container_width=True)
+        filtered_df = car_df[
+            (car_df["year"] == selected_year) &
+            (car_df["month"] == selected_month) &
+            (car_df["sido"] == selected_sido) &
+            (car_df["sigungu"] == selected_sigungu)
+        ]
+        
+        if filtered_df.empty:
+            st.warning("선택한 조건에 해당하는 데이터가 없습니다.")
+        else:
+            tabs_car = st.tabs(["차량 종류별", "차량 용도별"])
+            with tabs_car[0]:
+                st.subheader("차량 종류별 등록대수")
+                chart_df = filtered_df.groupby("car_type")["count"].sum().reset_index()
+                fig = px.bar(chart_df, x='car_type', y='count')
+                fig.update_layout(title_text='차량 종류별 등록대수', showlegend=False)
+                st.plotly_chart(fig, use_container_width=True)
+            with tabs_car[1]:
+                st.subheader("차량 용도별 비율")
+                pie_df = filtered_df.groupby("usage_type")["count"].sum().reset_index()
+                fig = px.pie(pie_df, names='usage_type', values='count', hole=0.45)
+                st.plotly_chart(fig, use_container_width=True)
+
+    with tabs[1]:
+        st.subheader("지역별 인구수 대비 자동차 등록대수 비율")
+        if not combined_df.empty:
+            fig_pie_ratio = px.pie(
+                combined_df,
+                values='car_pop_ratio',
+                names='sido',
+                title='지역별 자동차/인구 비율 ( 차량(대) / 인구(1000명) )',
+                hole=0.4
+            )
+            fig_pie_ratio.update_traces(textposition='inside', textinfo='percent+label')
+            st.plotly_chart(fig_pie_ratio, use_container_width=True)
+            
+            st.markdown("---")
+            st.subheader("결합 데이터 테이블")
+            st.dataframe(combined_df, use_container_width=True)
+        else:
+            st.warning("인구수/자동차 데이터 결합에 실패했습니다. 데이터를 다시 확인해주세요.")
+
+    with tabs[2]:
+        st.subheader("전체 데이터 테이블")
+        st.markdown("차량 등록 데이터:")
+        st.dataframe(car_df, use_container_width=True)
+        st.markdown("결합 데이터 (인구수/차량 비율):")
+        st.dataframe(combined_df, use_container_width=True)
 
 # ------------------ FAQ 페이지 ------------------
 def show_faq_page(faq_df):
@@ -198,6 +257,8 @@ def show_dashboard():
         st.session_state.car_data = pd.DataFrame()
     if 'faq_data' not in st.session_state:
         st.session_state.faq_data = pd.DataFrame()
+    if 'population_data' not in st.session_state:
+        st.session_state.population_data = pd.DataFrame()
 
     if st.session_state.page == 'loading':
         with st.spinner("데이터를 로드하는 중입니다. 처음 실행 시 시간이 걸릴 수 있습니다."):
@@ -228,6 +289,6 @@ def show_dashboard():
                 st.rerun()
 
         if st.session_state.page == "데이터 조회":
-            show_data_dashboard(st.session_state.car_data)
+            show_data_dashboard(st.session_state.car_data, st.session_state.population_data)
         elif st.session_state.page == "FAQ":
             show_faq_page(st.session_state.faq_data)

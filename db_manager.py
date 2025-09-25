@@ -39,5 +39,11 @@ def create_tables(engine):
                 source INT
             )
         """))
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS population (
+                region VARCHAR(10) NOT NULL,
+                popul INT NOT NULL
+            )
+        """))
         conn.commit()
     print("✅ 데이터베이스 테이블 생성 완료.")

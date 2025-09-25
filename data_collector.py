@@ -1,4 +1,3 @@
-# data_collector.py
 from selenium import webdriver as wd
 from selenium.webdriver.chrome.service import Service as sv
 from webdriver_manager.chrome import ChromeDriverManager as cdm
@@ -13,6 +12,9 @@ import time
 from sqlalchemy import text
 from dotenv import load_dotenv
 from db_manager import get_db_engine, create_tables
+
+# 모듈화된 파일에서 함수를 임포트합니다.
+from population_db import read_csv_to_list, insert_data_into_db
 
 load_dotenv()
 
@@ -138,7 +140,6 @@ def crawl_hyundai_faq():
                     driver.execute_script("arguments[0].click();", next_btn)
                     page_number += 1
                     wait.until(EC.staleness_of(faq_items[0]))
-                    time.sleep(1)
             except Exception:
                 print("다음 페이지 버튼 없음 → 종료")
                 break
@@ -181,8 +182,7 @@ def crawl_kia_faq():
             top_btn.click()
             all_btn = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#tab-list > li:nth-child(2) > button')))
             print("'전체' 버튼 클릭 중...")
-            driver.execute_script("arguments[0].click();", all_btn)  # JavaScript로 클릭하도록 수정
-            time.sleep(2)
+            driver.execute_script("arguments[0].click();", all_btn)
         except Exception as e:
             print(f"오류: '전체' 버튼을 찾을 수 없습니다. 계속 진행합니다. {e}")
 
@@ -201,7 +201,6 @@ def crawl_kia_faq():
                     
                     panel_id = f"accordion-item-{item_index}-panel"
 
-                    # 답변 패널이 보이지 않으면 클릭하여 열기
                     if "cmp-accordion__item--expanded" not in btn.get_attribute("class"):
                         driver.execute_script("arguments[0].click();", btn)
                     wait.until(EC.visibility_of_element_located((By.ID, panel_id)))
@@ -219,7 +218,6 @@ def crawl_kia_faq():
                     
                     a_text = "\n".join(content_list)
                     
-                    # 다음 항목을 위해 답변 닫기
                     driver.execute_script("arguments[0].click();", btn)
                     wait.until(EC.invisibility_of_element_located((By.ID, panel_id)))
 
@@ -235,9 +233,9 @@ def crawl_kia_faq():
                     print(f"  ❗ StaleElementReferenceException 발생. FAQ 항목 재탐색 후 재시도.")
                     faq_elements = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.cmp-accordion__item")))
                     if item_index < len(faq_elements):
-                        continue # 현재 항목 재시도
+                        continue
                     else:
-                        break # 목록 끝에 도달했으면 중단
+                        break
                 except Exception as e:
                     print(f"  ❗ FAQ 처리 오류: {e}")
                     continue
@@ -265,7 +263,6 @@ def crawl_kia_faq():
 
                 wait.until(EC.staleness_of(faq_elements[0]))
                 page_number += 1
-                time.sleep(1)
 
             except Exception as e:
                 print(f"다음 페이지 로직 실행 오류: {e}")
@@ -307,5 +304,14 @@ def collect_and_save_data():
         df_kia.to_sql('faq', con=engine, if_exists='append', index=False)
         print("✅ 기아차 FAQ 데이터 DB 추가 저장 완료.")
 
+    # ------------------ population_total_filtered.csv 데이터 처리 (추가) ------------------
+    print("\n--- population_total_filtered.csv 데이터 처리 시작 ---")
+    csv_data = read_csv_to_list('population_total_filtered.csv')
+    insert_data_into_db(csv_data)
+    
     engine.dispose()
     print("✅ 모든 데이터 수집 및 DB 저장 작업 완료.")
+
+
+if __name__ == "__main__":
+    collect_and_save_data()

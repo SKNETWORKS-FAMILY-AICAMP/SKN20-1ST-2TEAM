@@ -1,4 +1,3 @@
-# main_app.py
 import data_viewer
 
 if __name__ == "__main__":
