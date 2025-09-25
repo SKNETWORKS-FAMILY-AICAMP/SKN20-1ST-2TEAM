@@ -26,28 +26,32 @@ def load_data_and_save_to_session():
     
     combined_df = pd.DataFrame()
     if not car_df.empty and not population_df.empty:
-        # population 데이터의 region 컬럼을 앞 2글자로 전처리 (요청 반영)
+        # population 데이터의 region 컬럼을 앞 2글자로 전처리
         population_df['region'] = population_df['region'].str[:2]
         
-        # sido별 차량 등록대수 합계
-        car_summary = car_df.groupby('sido')['count'].sum().reset_index()
+        # 2024년 데이터만 필터링
+        car_2024_df = car_df[car_df['year'] == '2024']
         
-        # 두 데이터프레임 병합
-        combined_df = pd.merge(
-            car_summary, 
-            population_df, 
-            left_on='sido', 
-            right_on='region', 
-            how='inner'
-        )
-        
-        # '자동차대수_대비_인구수' 비율 계산
-        combined_df['car_pop_ratio'] = combined_df['count'] / combined_df['popul']
-        
-        # 컬럼 이름 정리
-        combined_df = combined_df.rename(columns={'count': 'car_count', 'popul': 'population'})
-        
-        print("✅ 지역별 자동차 대비 인구수 데이터셋 생성 완료.")
+        if not car_2024_df.empty:
+            # sido별 2024년 차량 등록대수 합계
+            car_summary = car_2024_df.groupby('sido')['count'].sum().reset_index()
+            
+            # 두 데이터프레임 병합
+            combined_df = pd.merge(
+                car_summary, 
+                population_df, 
+                left_on='sido', 
+                right_on='region', 
+                how='inner'
+            )
+            
+            # '인구 100명당 자동차 대수' 비율 계산
+            combined_df['car_pop_ratio'] = (combined_df['count'] / combined_df['popul']) * 100
+            
+            # 컬럼 이름 정리
+            combined_df = combined_df.rename(columns={'count': 'car_count', 'popul': 'population'})
+            
+            print("✅ 2024년 지역별 자동차 대비 인구수 데이터셋 생성 완료.")
 
     st.session_state.car_data = car_df
     st.session_state.faq_data = faq_df
@@ -90,7 +94,7 @@ def show_data_dashboard(car_df, combined_df):
         </div>
     """, unsafe_allow_html=True)
     
-    tabs = st.tabs(["차량 통계", "인구수-차량 비율", "데이터 테이블"])
+    tabs = st.tabs(["차량 통계", "데이터 테이블", "인구수-차량 비율"])
 
     with tabs[0]:
         st.subheader("차량 등록 데이터")
@@ -135,14 +139,14 @@ def show_data_dashboard(car_df, combined_df):
                 fig = px.pie(pie_df, names='usage_type', values='count', hole=0.45)
                 st.plotly_chart(fig, use_container_width=True)
 
-    with tabs[1]:
+    with tabs[2]:
         st.subheader("지역별 인구수 대비 자동차 등록대수 비율")
         if not combined_df.empty:
             fig_pie_ratio = px.pie(
                 combined_df,
                 values='car_pop_ratio',
                 names='sido',
-                title='지역별 자동차/인구 비율 ( 차량(대) / 인구(1000명) )',
+                title='지역별 자동차/인구 비율 (차량(대)/인구(1000명))',
                 hole=0.4
             )
             fig_pie_ratio.update_traces(textposition='inside', textinfo='percent+label')
@@ -154,7 +158,7 @@ def show_data_dashboard(car_df, combined_df):
         else:
             st.warning("인구수/자동차 데이터 결합에 실패했습니다. 데이터를 다시 확인해주세요.")
 
-    with tabs[2]:
+    with tabs[1]:
         st.subheader("전체 데이터 테이블")
         st.markdown("차량 등록 데이터:")
         st.dataframe(car_df, use_container_width=True)
