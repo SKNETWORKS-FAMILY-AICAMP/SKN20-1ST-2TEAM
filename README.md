@@ -124,8 +124,8 @@
 ## 🖥️ Streamlit 시연 화면  
 
 ![s1](./screenshot/1.png)  
-![s2](./screenshot/2.png)  
-![s3](./screenshot/3.png)  
+![s2](./screenshot/3.png)  
+![s3](./screenshot/2.png)  
 ![s4](./screenshot/4.png)
 
 ---
