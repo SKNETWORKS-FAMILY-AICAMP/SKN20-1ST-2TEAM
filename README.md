@@ -8,12 +8,35 @@
 
 ## 😎 팀 소개  
 
-| 팀원   | 역할              | 기여                                  | 이미지 |
-|--------|-------------------|---------------------------------------|--------|
-| 박준석 | 데이터 엔지니어   | MOLIT API 처리, 시도별 데이터 분석    | ![jun](./img/Mr_Krabs_character.png) |
-| 이도경 | 분석 담당         | 데이터 전처리, 테이블 명세서 작성     | ![do](./img/patrick.jpeg) |
-| 이성현 | 데이터베이스 담당 | ERD 설계, DB 구축 및 연동             | ![lee](./img/plankton.jpeg) |
-| 최유정 | 프론트엔드/UI     | Streamlit 화면 설계 및 발표 자료 제작 | ![choi](./img/squirrel.jpg) |
+<table>
+  <tr>
+    <td align="center">
+      <img src="./img/Mr_Krabs_character.png" width="100"><br>
+      <b>박준석</b><br>
+      데이터 엔지니어<br>
+      <sub>MOLIT API 처리, 시도별 데이터 분석</sub>
+    </td>
+    <td align="center">
+      <img src="./img/patrick.jpeg" width="100"><br>
+      <b>이도경</b><br>
+      분석 담당<br>
+      <sub>데이터 전처리, 테이블 명세서 작성</sub>
+    </td>
+    <td align="center">
+      <img src="./img/plankton.jpeg" width="100"><br>
+      <b>이성현</b><br>
+      데이터베이스 담당<br>
+      <sub>ERD 설계, DB 구축 및 연동</sub>
+    </td>
+    <td align="center">
+      <img src="./img/squirrel.jpg" width="100"><br>
+      <b>최유정</b><br>
+      프론트엔드/UI<br>
+      <sub>Streamlit 화면 설계 및 발표 자료 제작</sub>
+    </td>
+  </tr>
+</table>
+
 
 
 ---
