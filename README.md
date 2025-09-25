@@ -121,6 +121,12 @@
 
 ---
 
+## 🗂️ ERD  
+
+<img src="./screenshot/erd.png" width="600">
+
+---
+
 ## 🖥️ Streamlit 시연 화면  
 
 ![s1](./screenshot/1.png)  
