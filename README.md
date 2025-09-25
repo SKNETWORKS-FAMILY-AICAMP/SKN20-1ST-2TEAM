@@ -122,7 +122,9 @@
 ---
 ## 🗂️ ERD  
 
-<img src="./screenshot/erd.png" width="600">
+<p align="center">
+  <img src="./screenshot/erd.png" width="800">
+</p>
 
 ---
 
