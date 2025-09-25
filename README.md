@@ -29,7 +29,7 @@
       <sub>ERD 설계, DB 구축 및 연동</sub>
     </td>
     <td align="center">
-      <img src="./img/squirrel.jpg" width="100"><br>
+      <img src="./img/squirrel-removebg-preview.png" width="100"><br>
       <b>최유정</b><br>
       프론트엔드/UI<br>
       <sub>Streamlit 화면 설계 및 발표 자료 제작</sub>
