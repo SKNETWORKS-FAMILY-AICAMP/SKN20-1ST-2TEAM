@@ -20,7 +20,7 @@ USE `mobilitydb` ;
 -- -----------------------------------------------------
 -- Table `mobilitydb`.`car_regist`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mobilitydb`.`car_regist` (
+CREATE TABLE IF NOT EXISTS `mobilitydb`.`CAR_REGIST` (
   `reg_date` TEXT NULL DEFAULT NULL,
   `sido` TEXT NULL DEFAULT NULL,
   `sigungu` TEXT NULL DEFAULT NULL,
@@ -34,7 +34,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- -----------------------------------------------------
 -- Table `mobilitydb`.`faq`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mobilitydb`.`faq` (
+CREATE TABLE IF NOT EXISTS `mobilitydb`.`FAQ` (
   `category` TEXT NULL DEFAULT NULL,
   `question` TEXT NULL DEFAULT NULL,
   `answer` TEXT NULL DEFAULT NULL,
@@ -46,7 +46,7 @@ DEFAULT CHARACTER SET = utf8mb4;
 -- -----------------------------------------------------
 -- Table `mobilitydb`.`population`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mobilitydb`.`population` (
+CREATE TABLE IF NOT EXISTS `mobilitydb`.`POPULATION` (
   `region` VARCHAR(10) NOT NULL,
   `popul` INT NOT NULL)
 ENGINE = InnoDB
