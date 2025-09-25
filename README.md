@@ -98,6 +98,15 @@
 
 ---
 
+## 🖥️ Streamlit 시연 화면  
+
+![s1](./screenshot/1.png)  
+![s2](./screenshot/2.png)  
+![s3](./screenshot/3.png)  
+![s4](./screenshot/4.png)
+
+---
+
 ## 💡 개선 제안
 
 * **공공데이터**: 시각화 대시보드 제공, 비전문가 활용성 확대
